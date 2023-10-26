@@ -1,0 +1,68 @@
+from tkinter import *
+import aicam as cm
+import audiosys as a
+import videosys as v
+
+
+#함수
+## 입력된 글자 처리
+def get_text():
+    return entry.get()
+def clear_text():
+    entry.delete(0,END)
+def write_text(txt):
+    entry.insert(0, txt)
+
+## 음성인식과 음성변환
+def get_audio():
+    out_txt = a.get_audio()
+    clear_text()
+    write_text(out_txt)    
+def to_speak():
+    in_txt = get_text()
+    clear_text()
+    a.speak(in_txt)
+
+## 글 -> 수어
+def to_sign():
+    in_txt = get_text()
+    clear_text()
+    v.create_root(in_txt)
+
+## 수어 -> 글
+def open_aicam():
+    result = cm.opencam()
+    clear_text()
+    write_text(result) 
+
+# GUI 프로그래밍
+
+window=Tk()
+window.title("Sign Language Translator")
+
+Label(window, text="소통").grid(row=0,column=0)
+
+##엔트리 생성(텍스트 입력/출력)
+entry=Entry(window,width=30, bg="skyblue")
+entry.grid(row=1,column=0)
+
+##입력 프레임
+fr1 = Frame(window,width=100,height=1)
+fr1.grid(row=2, column=0)
+
+### 입력 방식
+Label(fr1, text="입력 방법을 선택하세요.").grid(row=0,column=0)
+Button(fr1,text="카메라",width=10,height=1,command=open_aicam).grid(row=1,column=0,sticky=W, padx=10)
+Button(fr1,text="음성인식",width=10,height=1,activebackground="skyblue",command=get_audio).grid(row=1,column=3, padx=10,sticky=E)
+
+## 출력 프레임
+fr2 = Frame(window)
+fr2.grid(row=3, column=0)
+
+### 출력 방식
+Label(fr2, text="출력 방법을 선택하세요.").grid(row=0,column=0)
+Button(fr2,text="수어",width=30,height=1,command=to_sign).grid(row=1,column=1,sticky=E)
+Button(fr2,text="음성",width=30,height=1,command=to_speak).grid(row=1,column=2,sticky=W)
+
+
+window.mainloop()
