@@ -1,0 +1,118 @@
+#기본 문장에 대한 수어 필요 예:) 안녕하세요. 감사합니다. 죄송합니다. 등등
+from tkinter import *
+import cv2
+import numpy as np
+from PIL import Image, ImageTk
+
+# 단어에 따른 동영상 파일 경로 매핑
+video_paths = {
+    "안녕하세요": "C:\\Users\\USER\\sjb\\vid\\hello.mp4",
+    "나": "C:\\Users\\USER\\sjb\\vid\\me.mp4",
+    "빵": "C:\\Users\\USER\\sjb\\vid\\bread.mp4",
+    "먹다": "C:\\Users\\USER\\sjb\\vid\\eat.mp4",
+    "개": "C:\\Users\\USER\\sjb\\vid\\dog.mp4",
+    "짖다": "C:\\Users\\USER\\sjb\\vid\\bark.mp4",
+    "끝": "C:\\Users\\USER\\sjb\\vid\\end.mp4",
+    "먹다": "C:\\Users\\USER\\sjb\\vid\\eat.mp4",
+    "피자": "C:\\Users\\USER\\sjb\\vid\\pizza.mp4",
+    "보다": "C:\\Users\\USER\\sjb\\vid\\boda.mp4",
+    "초밥": "C:\\Users\\USER\\sjb\\vid\\sushi.mp4",
+    "좋다": "C:\\Users\\USER\\sjb\\vid\\like.mp4",
+    "고양이": "C:\\Users\\USER\\sjb\\vid\\cat.mp4",
+    "물고기": "C:\\Users\\USER\\sjb\\vid\\fish.mp4"
+}
+
+# 서술어 변형과 수어 문법으로 교체된 단어들 리스트화
+eat = ['먹다.','먹는다.','먹습니다.','먹어.','먹어요.','먹었다.','먹었습니다.','먹었어요.','먹었었다.','먹었었습니다.','먹었었어요.','먹었었어.']
+r_eat = ['먹다','먹다','먹다','먹다','먹다','먹다 끝','먹다 끝','먹다 끝','먹다 끝','먹다 끝','먹다 끝','먹다 끝']
+bark = ['짖다.','짖는다.','짖습니다.','짖어.','짖어요.','짖었다.','짖었습니다.','짖었어요.','짖었었다.','짖었었습니다.','짖었었어요.','짖었었어.']
+r_bark = ['짖다','짖다','짖다','짖다','짖다','짖다 끝','짖다 끝','짖다 끝','짖다 끝','짖다 끝','짖다 끝','짖다 끝']
+like = ['좋다.','좋다.','좋습니다.','좋아.','좋아요.','좋았다.','좋았습니다.','좋았어요.','좋았었다.','좋았었습니다.','좋았었어요.','좋았었어.']
+r_like = ['좋다','좋다','좋다','좋다','좋다','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝']
+like2 = ['좋아하다.','좋아한다.','좋아합니다.','좋아해.','좋아해요.','좋아했다.','좋아했습니다.','좋아했어요.','좋아했었다.','좋아했었습니다.','좋아했었어요.','좋아했었어.']
+r_like2 = ['좋다','좋다','좋다','좋다','좋다','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝','좋다 끝']
+boda = "보다 "
+
+##문장 마지막에 무조건 마침표 찍기.##
+
+# 입력된 단어에 따라 동영상을 재생하는 함수
+def play_video(): 
+    words = entry
+
+#    words = entry.get()      
+    
+    #변형돌리기
+    words = words.replace('내가 ', '나가 ')
+    words = words.replace('저는 ', '나는 ')
+    words = words.replace('제가 ', '나가 ')
+#    words = words.replace('네가 ', '너가 ')
+
+    words = words.replace('이 ', ' ')
+    words = words.replace('가 ', ' ')
+    words = words.replace('는 ', ' ')
+    words = words.replace('은 ', ' ')
+    words = words.replace('을 ', ' ')
+    words = words.replace('를 ', ' ')
+
+    if boda in words:
+        words = words.replace('보다 ', ' 보다 ', 1)
+        words = words.replace(' 더 ',' ', 1)
+
+    for i in range(1,12): 
+        if eat[i] in words:
+            words = words.replace(eat[i], r_eat[i])
+        if bark[i] in words:
+            words = words.replace(bark[i], r_bark[i])
+        if like[i] in words:
+            words = words.replace(like[i], r_like[i])
+        if like2[i] in words:
+            words = words.replace(like2[i], r_like2[i])
+    words = words.split()  # 입력된 단어를 공백으로 분리
+
+    for word in words:
+        video_path = None
+        for keyword, path in video_paths.items():
+            if keyword in word:
+                video_path = path
+                break
+
+        if video_path:
+            cap = cv2.VideoCapture(video_path)
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                photo = ImageTk.PhotoImage(Image.fromarray(frame), master=root)
+                canvas.create_image(0, 0, image=photo, anchor=NW)
+                canvas.image = photo
+                root.update()
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+            cap.release()
+    kill_root()
+
+# 창 종료
+def kill_root():
+    root.destroy()
+
+# Tkinter 창 생성
+def create_root(output_text):
+    global root, label, entry, button, canvas
+    root = Tk()
+    root.title("동영상 재생기")
+
+    # 입력 필드 및 버튼 생성
+    label = Label(root, text="글 입력(마침표 필수):")
+    label.pack()
+    entry=output_text
+    
+    # 동영상 프레임을 표시할 Canvas 생성
+    canvas = Canvas(root, width=680, height=460)
+    canvas.pack()
+    
+    play_video()
+
+    root.mainloop()
+
+#영상 출처 : 국립국어원 한국수어사전 (https://sldict.korean.go.kr/front/main/main.do)
