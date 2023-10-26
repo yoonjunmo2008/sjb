@@ -1,0 +1,14 @@
+0 hello
+1 I
+2 bread
+3 eat
+4 dog
+5 bark
+6 end
+7 pizza
+8 better
+9 siusi
+10 like
+11 cat
+12 fish
+13 nothing
