@@ -1,7 +1,6 @@
 #기본 문장에 대한 수어 필요 예:) 안녕하세요. 감사합니다. 죄송합니다. 등등
 from tkinter import *
 import cv2
-import numpy as np
 from PIL import Image, ImageTk
 
 # 단어에 따른 동영상 파일 경로 매핑
